@@ -18,6 +18,8 @@ owned by `android_device_lenovo_kirby`.
   configuration, board-asset, and reference-output lock.
 - `manifests/m9.731-repo-manifest.xml`: exact Lineage source manifest retained
   by the M9.731 build evidence.
+- `manifests/m9.731-release-assets.sha256`: exact names and hashes for the
+  three large files published with the M9.731 GitHub Release.
 - `scripts/`: fail-closed fetch, input installation, verification, and kernel
   reproduction helpers.
 - `docs/kernel-reproduction.md`: end-to-end procedure and scope boundaries.
@@ -52,11 +54,26 @@ The following retained files are intentionally not committed to Git:
 ```text
 android14-6.1-2024-11_r1.tar.gz
 m9.731-Image
+pvmfw.img
 ```
 
 Their exact sizes and hashes are recorded in
 `manifests/m9.731-release-assets.sha256`. Publish them as GitHub Release assets
 and retain at least one independent offline copy.
+
+`pvmfw.img` is the exact 1 MiB Stock ZUXOS 1.5.10.106 260113 image used by
+the coherent M9.731 AVB/OTA chain. It is not consumed by `m kernel` and is not
+part of the Android Common Kernel source. It is retained here because a full
+ROM reconstruction needs its descriptor when generating the matching
+`vbmeta_system`; the GKI `Image` can be reproduced without it.
+Its Stock source member is `TB321FU_ZUX_1.5.10.106_Tool/image/pvmfw.img`.
+
+After downloading all three assets into the ignored `release-assets/`
+directory, verify them from the repository root with:
+
+```bash
+(cd release-assets && sha256sum -c ../manifests/m9.731-release-assets.sha256)
+```
 
 ## Exclusions
 
@@ -64,6 +81,10 @@ This repository must not contain signing keys, ccache, the Android `out`
 directory, account/device data, or the 1.5 GiB non-product
 `kernel/lenovo/TB321FU` research workspace. The research workspace is not the
 normal `TARGET_KERNEL_SOURCE` for the qualified build.
+
+The public `pvmfw.img` Release asset does not replace the complete Lenovo
+Stock package or private release-signing inputs. Preserve those separately
+when exact owner-signed OTA reconstruction is required.
 
 This repository also does not replace the full M9.731 build/runtime evidence.
 Its purpose is to make the selected kernel inputs discoverable, fetchable and

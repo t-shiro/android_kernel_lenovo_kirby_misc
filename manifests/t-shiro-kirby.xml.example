@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-    <!-- Pin the misc project to its commit after the initial human commit. -->
+    <!-- Keep every locally owned project on an immutable M9.731 identity. -->
     <remote name="t-shiro"
             fetch="https://github.com/t-shiro/" />
     <remote name="aosp-kernel"
@@ -22,5 +22,5 @@
     <project name="android_kernel_lenovo_kirby_misc"
              path="kernel/lenovo/kirby-misc"
              remote="t-shiro"
-             revision="main" />
+             revision="tb321fu-m9.731-runtime-qualified-v1" />
 </manifest>

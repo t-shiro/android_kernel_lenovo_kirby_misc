@@ -19,6 +19,11 @@ The product deliberately combines:
 The current GKI build produces the core `Image` only. It does not rebuild the
 Stock-generation vendor modules, DTB or DTBO.
 
+The M9.731 GitHub Release also retains the exact Stock `pvmfw.img` used by the
+coherent full-ROM AVB chain. That file is not a GKI build input and is not
+needed to reproduce the core `Image`; it is needed later when reconstructing
+the complete M9.731 `vbmeta_system` descriptor set and OTA carrier.
+
 ## Frozen identity
 
 The machine-readable authority is
@@ -59,6 +64,7 @@ kernel/google/android14-6.1-2024-11_r1
 kernel/lenovo/kirby-misc
 kernel/prebuilts/msm_uapi_headers.tar.gz
 prebuilts/clang/host/linux-x86/clang-r563880c
+kernel/lenovo/kirby-misc/release-assets/pvmfw.img  # full ROM/AVB only
 ```
 
 The full shared Lineage source must match
@@ -103,7 +109,7 @@ The helper never overwrites a differing existing file. A future reviewed
 device-tree change may point `TARGET_PREBUILT_KERNEL_HEADERS` directly at the
 misc repository, but M9.731 reconstruction keeps the historical path.
 
-## 3. Verify every frozen input
+## 3. Verify the frozen kernel-build inputs
 
 ```bash
 kernel/lenovo/kirby-misc/scripts/verify-kernel-inputs.sh
@@ -120,7 +126,36 @@ kernel/lenovo/kirby-misc/scripts/verify-kernel-inputs.sh \
   --with-current-outputs
 ```
 
-## 4. Review the build plan
+## 4. Verify the GitHub Release assets
+
+Download all three assets into the ignored `release-assets/` directory:
+
+```text
+android14-6.1-2024-11_r1.tar.gz
+m9.731-Image
+pvmfw.img
+```
+
+Then verify their exact bytes:
+
+```bash
+(cd kernel/lenovo/kirby-misc/release-assets && \
+  sha256sum -c ../manifests/m9.731-release-assets.sha256)
+```
+
+The expected `pvmfw.img` identity is:
+
+```text
+Stock generation: ZUXOS 1.5.10.106 260113
+Stock member:     TB321FU_ZUX_1.5.10.106_Tool/image/pvmfw.img
+Size:             1048576 bytes
+SHA-256:          7febe8ccadacf3a8dd2dfa85f98385fdca35044046b592b119849dd8c9428dc5
+```
+
+Keep the asset byte-exact. Do not rebuild, re-sign or replace it with the older
+ZUI 16.1.11.187 `pvmfw.img`.
+
+## 5. Review the build plan
 
 ```bash
 kernel/lenovo/kirby-misc/scripts/reproduce-kernel-image.sh --plan
@@ -129,7 +164,7 @@ kernel/lenovo/kirby-misc/scripts/reproduce-kernel-image.sh --plan
 The plan is read-only. It records the exact lunch target, build target and
 expected hashes.
 
-## 5. Build only with separate authority
+## 6. Build only with separate authority
 
 A host build writes `out` and can consume substantial disk and time. Confirm
 the project build authority, disk/inode floor, output retention location,
@@ -164,16 +199,22 @@ Publish the following without adding them to Git history:
 ```text
 android14-6.1-2024-11_r1.tar.gz
 m9.731-Image
+pvmfw.img
 ```
 
 Verify them with:
 
 ```bash
-sha256sum -c manifests/m9.731-release-assets.sha256
+(cd release-assets && sha256sum -c ../manifests/m9.731-release-assets.sha256)
 ```
 
 The `.config`, UAPI archive, lock, source manifest and scripts are small and
 remain ordinary Git-tracked files. Do not publish private signing material.
+
+The retained `pvmfw.img` closes loss of the exact Stock boot dependency used
+by the M9.731 AVB graph. It does not make the owner-signed full ROM independently
+reproducible: exact private signing keys, the official MindTheGapps package and
+the corresponding target-files/OTA procedure remain separate inputs.
 
 ## Known provenance boundary
 
