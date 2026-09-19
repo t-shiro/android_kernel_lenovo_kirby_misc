@@ -1,0 +1,3 @@
+*.tar.gz binary
+configs/*.config linguist-language=Kconfig
+manifests/m9.731-repo-manifest.xml -whitespace

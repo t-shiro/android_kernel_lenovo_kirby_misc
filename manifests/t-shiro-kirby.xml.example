@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+    <!-- Pin the misc project to its commit after the initial human commit. -->
+    <remote name="t-shiro"
+            fetch="https://github.com/t-shiro/" />
+    <remote name="aosp-kernel"
+            fetch="https://android.googlesource.com/" />
+
+    <project name="android_device_lenovo_kirby"
+             path="device/lenovo/kirby"
+             remote="t-shiro"
+             revision="9b2984dbec3a8486df283a0143deeabdb199620a" />
+    <project name="android_vendor_lenovo_kirby"
+             path="vendor/lenovo/kirby"
+             remote="t-shiro"
+             revision="cad070d14a40506ad135547f9f29f205bd9b65b5" />
+    <project name="kernel/common"
+             path="kernel/google/android14-6.1-2024-11_r1"
+             remote="aosp-kernel"
+             revision="d03cb1d7abcd078dabe73ed711be068ca9b364b8"
+             clone-depth="1" />
+    <project name="android_kernel_lenovo_kirby_misc"
+             path="kernel/lenovo/kirby-misc"
+             remote="t-shiro"
+             revision="main" />
+</manifest>
